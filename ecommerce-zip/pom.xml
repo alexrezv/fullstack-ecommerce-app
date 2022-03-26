@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+
+    <parent>
+        <artifactId>full-stack-ecommerce-app</artifactId>
+        <groupId>org.example</groupId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+
+    <groupId>com.alexrezv</groupId>
+    <artifactId>ecommerce-zip</artifactId>
+    <packaging>jar</packaging>
+
+    <properties>
+        <fileName>${artifactId}-${project.version}</fileName>
+        <directoryName>ecommerce</directoryName>
+        <docker-maven-plugin.version>0.39.1</docker-maven-plugin.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.alexrezv</groupId>
+            <artifactId>ecommerce-backend</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>3.3.0</version>
+                <configuration>
+                    <appendAssemblyId>false</appendAssemblyId>
+                    <descriptors>
+                        <descriptor>src/main/assembly/zip.xml</descriptor>
+                    </descriptors>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>zip-assembly</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+    <profiles>
+        <profile>
+            <id>Docker</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>io.fabric8</groupId>
+                        <artifactId>docker-maven-plugin</artifactId>
+                        <version>${docker-maven-plugin.version}</version>
+                        <configuration>
+                            <useColor>true</useColor>
+                            <images>
+                                <image>
+                                    <alias>ecommerce-postgres</alias>
+                                    <name>ecommerce-postgres</name>
+                                    <build>
+                                        <from>postgres:14</from>
+                                        <tags>
+                                            <tag>latest</tag>
+                                        </tags>
+                                        <assembly>
+                                            <mode>dir</mode>
+                                            <targetDir>/docker-entrypoint-initdb.d</targetDir>
+                                            <inline>
+                                                <fileSets>
+                                                    <fileSet>
+                                                        <directory>
+                                                            ${basedir}/target/${fileName}/${directoryName}/db/postgresql/scripts/
+                                                        </directory>
+                                                        <outputDirectory>.</outputDirectory>
+                                                        <includes>
+                                                            <include>*.sql</include>
+                                                        </includes>
+                                                        <excludes>
+                                                            <exclude>02-createuser.sql</exclude>
+                                                        </excludes>
+                                                    </fileSet>
+                                                </fileSets>
+                                            </inline>
+                                        </assembly>
+                                    </build>
+                                    <run>
+                                        <ports>
+                                            <port>5432:5432</port>
+                                        </ports>
+                                        <env>
+                                            <POSTGRES_PASSWORD>ecommerceapp</POSTGRES_PASSWORD>
+                                            <POSTGRES_USER>ecommerceapp</POSTGRES_USER>
+                                            <POSTGRES_DB>ecommerce</POSTGRES_DB>
+                                        </env>
+                                        <wait>
+                                            <log>database system is ready to accept connections</log>
+                                            <time>20000</time>
+                                        </wait>
+                                        <namingStrategy>alias</namingStrategy>
+                                    </run>
+                                </image>
+                                <image>
+                                    <alias>ecommerce-app</alias>
+                                    <name>ecommerce-app</name>
+                                    <build>
+                                        <from>openjdk:17</from>
+                                        <maintainer>alexrezv</maintainer>
+                                        <tags>
+                                            <tag>latest</tag>
+                                        </tags>
+                                        <assembly>
+                                            <mode>dir</mode>
+                                            <targetDir>/opt/</targetDir>
+                                            <inline>
+                                                <fileSets>
+                                                    <fileSet>
+                                                        <directory>${basedir}/target/${fileName}/</directory>
+                                                        <outputDirectory>.</outputDirectory>
+                                                    </fileSet>
+                                                </fileSets>
+                                            </inline>
+                                        </assembly>
+                                        <runCmds>
+                                            <run>chmod +x /opt -R</run>
+                                        </runCmds>
+                                        <entryPoint>
+                                            <shell>
+                                                java -jar /opt/${directoryName}/ecommerce-backend-1.0-SNAPSHOT.jar --dbHost=ecommerce-postgres
+                                            </shell>
+                                        </entryPoint>
+                                        <workdir>/opt/${directoryName}/</workdir>
+                                        <ports>
+                                            <port>8080</port>
+                                        </ports>
+                                    </build>
+                                    <run>
+                                        <dependsOn>
+                                            <container>ecommerce-postgres</container>
+                                        </dependsOn>
+                                        <ports>
+                                            <!-- WEB -->
+                                            <port>8080:8080</port>
+                                            <!-- JAVA Remote Debug -->
+                                            <port>5005:5005</port>
+                                        </ports>
+                                        <links>
+                                            <link>ecommerce-postgres:ecommerce-postgres</link>
+                                        </links>
+                                        <namingStrategy>alias</namingStrategy>
+                                    </run>
+                                </image>
+                            </images>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
+</project>
