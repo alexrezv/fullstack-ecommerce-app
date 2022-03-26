@@ -1,0 +1,28 @@
+<assembly xmlns="http://maven.apache.org/ASSEMBLY/2.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/ASSEMBLY/2.0.0 https://maven.apache.org/xsd/assembly-2.0.0.xsd">
+
+    <id>assembly</id>
+    <baseDirectory>/</baseDirectory>
+    <formats>
+        <format>zip</format>
+        <format>dir</format>
+    </formats>
+    <fileSets>
+        <fileSet>
+            <directory>${basedir}/src/main/resources</directory>
+            <outputDirectory>/${directoryName}</outputDirectory>
+        </fileSet>
+    </fileSets>
+    <dependencySets>
+        <dependencySet>
+            <includes>
+                <include>
+                    com.alexrezv:ecommerce-backend:jar
+                </include>
+            </includes>
+            <outputDirectory>
+                /${directoryName}
+            </outputDirectory>
+        </dependencySet>
+    </dependencySets>
+</assembly>
