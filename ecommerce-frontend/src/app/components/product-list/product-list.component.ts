@@ -30,9 +30,9 @@ export class ProductListComponent implements OnInit {
 
   listProducts() {
     if (this.route.snapshot.paramMap.has('id')) {
-      return this.productService.getProductListByCategoryId(+this.route.snapshot.paramMap.get('id')!)
+      return this.productService.getProductsByCategoryId(+this.route.snapshot.paramMap.get('id')!)
     }
-    return this.productService.getProductList()
+    return this.productService.getProducts()
   }
 
 }

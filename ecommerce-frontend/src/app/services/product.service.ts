@@ -2,28 +2,38 @@ import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {Product} from "../common/product";
 import {map, Observable} from "rxjs";
+import {ProductCategory} from "../common/product-category";
 
 @Injectable({
   providedIn: 'root'
 })
 export class ProductService {
 
-  private baseUrl = 'http://0.0.0.0:8080/api/products'
+  private productsUrl = 'http://0.0.0.0:8080/api/products'
+  private categoryUrl = 'http://0.0.0.0:8080/api/product-category'
 
   constructor(private httpClient: HttpClient) {
   }
 
-  getProductList(): Observable<Product[]> {
+  getProductCategories(): Observable<ProductCategory[]> {
     return this.httpClient
-      .get<ProductsResponse>(this.baseUrl)
+      .get<ProductCategoryResponse>(this.categoryUrl)
+      .pipe(
+        map(response => response._embedded.productCategory)
+      );
+  }
+
+  getProducts(): Observable<Product[]> {
+    return this.httpClient
+      .get<ProductsResponse>(this.productsUrl)
       .pipe(
         map(response => response._embedded.products)
       );
   }
 
-  getProductListByCategoryId(categoryId: number): Observable<Product[]> {
+  getProductsByCategoryId(categoryId: number): Observable<Product[]> {
     return this.httpClient
-      .get<ProductsResponse>(`${this.baseUrl}/search/findByCategoryId?id=${categoryId}`)
+      .get<ProductsResponse>(`${this.productsUrl}/search/findByCategoryId?id=${categoryId}`)
       .pipe(
         map(response => response._embedded.products)
       );
@@ -34,5 +44,11 @@ export class ProductService {
 interface ProductsResponse {
   _embedded: {
     products: Product[]
+  }
+}
+
+interface ProductCategoryResponse {
+  _embedded: {
+    productCategory: ProductCategory[]
   }
 }
