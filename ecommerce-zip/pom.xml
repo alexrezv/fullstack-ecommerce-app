@@ -6,13 +6,15 @@
 
 
     <parent>
+        <groupId>com.alexrezv</groupId>
         <artifactId>full-stack-ecommerce-app</artifactId>
-        <groupId>org.example</groupId>
-        <version>1.0-SNAPSHOT</version>
+        <version>1.0-RELEASE</version>
     </parent>
 
-    <groupId>com.alexrezv</groupId>
     <artifactId>ecommerce-zip</artifactId>
+    <version>${project.parent.version}</version>
+    <name>ecommerce-zip</name>
+    <description>Zip of the eCommerce project</description>
     <packaging>jar</packaging>
 
     <properties>
@@ -25,7 +27,7 @@
         <dependency>
             <groupId>com.alexrezv</groupId>
             <artifactId>ecommerce-backend</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>${project.version}</version>
         </dependency>
     </dependencies>
 
@@ -132,12 +134,9 @@
                                                 </fileSets>
                                             </inline>
                                         </assembly>
-                                        <runCmds>
-                                            <run>chmod +x /opt -R</run>
-                                        </runCmds>
                                         <entryPoint>
                                             <shell>
-                                                java -jar /opt/${directoryName}/ecommerce-backend-1.0-SNAPSHOT.jar --dbHost=ecommerce-postgres
+                                                java -jar /opt/${directoryName}/ecommerce-backend-${project.version}.jar --dbHost=ecommerce-postgres
                                             </shell>
                                         </entryPoint>
                                         <workdir>/opt/${directoryName}/</workdir>

@@ -5,13 +5,15 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
+        <groupId>com.alexrezv</groupId>
         <artifactId>full-stack-ecommerce-app</artifactId>
-        <groupId>org.example</groupId>
-        <version>1.0-SNAPSHOT</version>
+        <version>1.0-RELEASE</version>
     </parent>
 
-    <groupId>com.alexrezv</groupId>
     <artifactId>ecommerce-frontend</artifactId>
+    <version>${project.parent.version}</version>
+    <name>ecommerce-frontend</name>
+    <description>Front-End for the eCommerce project</description>
     <packaging>jar</packaging>
 
     <properties>
