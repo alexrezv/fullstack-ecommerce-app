@@ -32,6 +32,9 @@ export class ProductListComponent implements OnInit {
     if (this.route.snapshot.paramMap.has('id')) {
       return this.productService.getProductsByCategoryId(+this.route.snapshot.paramMap.get('id')!)
     }
+    if (this.route.snapshot.paramMap.has('keyword')) {
+      return this.productService.getProductsByKeyword(this.route.snapshot.paramMap.get('keyword')!)
+    }
     return this.productService.getProducts()
   }
 

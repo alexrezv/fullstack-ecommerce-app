@@ -1,4 +1,7 @@
 <div class="row">
+  <div *ngIf="products?.length == 0" class="alert alert-warning col-md-12" role="alert">
+    No products found.
+  </div>
   <div *ngFor="let product of products" class="col-md-3">
     <div class="product-box">
       <img src="{{product.imageUrl}}" alt="cover"/>
