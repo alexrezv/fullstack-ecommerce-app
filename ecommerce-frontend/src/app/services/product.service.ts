@@ -47,6 +47,10 @@ export class ProductService {
       );
   }
 
+  getProduct(productId: number) {
+    return this.httpClient.get<Product>(`${this.productsUrl}/${productId}`)
+  }
+
 }
 
 interface ProductsResponse {

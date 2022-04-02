@@ -10,7 +10,7 @@ import {ActivatedRoute} from "@angular/router";
 })
 export class ProductListComponent implements OnInit {
 
-  products: Product[]
+  products: Product[] = []
 
   constructor(
     private productService: ProductService,
