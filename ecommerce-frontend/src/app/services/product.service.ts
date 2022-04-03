@@ -23,27 +23,22 @@ export class ProductService {
       );
   }
 
-  getProducts(): Observable<Product[]> {
+  getProducts(page: number, pageSize: number): Observable<ProductsResponse> {
     return this.httpClient
-      .get<ProductsResponse>(this.productsUrl)
-      .pipe(
-        map(response => response._embedded.products)
+      .get<ProductsResponse>(`${this.productsUrl}?page=${page}&size=${pageSize}`);
+  }
+
+  getProductsByCategoryId(categoryId: number, page: number, pageSize: number): Observable<ProductsResponse> {
+    return this.httpClient
+      .get<ProductsResponse>(
+        `${this.productsUrl}/search/findByCategoryId?id=${categoryId}&page=${page}&size=${pageSize}`
       );
   }
 
-  getProductsByCategoryId(categoryId: number): Observable<Product[]> {
+  getProductsByKeyword(keyword: string, page: number, pageSize: number): Observable<ProductsResponse> {
     return this.httpClient
-      .get<ProductsResponse>(`${this.productsUrl}/search/findByCategoryId?id=${categoryId}`)
-      .pipe(
-        map(response => response._embedded.products)
-      );
-  }
-
-  getProductsByKeyword(keyword: string): Observable<Product[]> {
-    return this.httpClient
-      .get<ProductsResponse>(`${this.productsUrl}/search/findByNameContaining?name=${keyword}`)
-      .pipe(
-        map(response => response._embedded.products)
+      .get<ProductsResponse>(
+        `${this.productsUrl}/search/findByNameContainingIgnoreCase?name=${keyword}&page=${page}&size=${pageSize}`
       );
   }
 
@@ -56,6 +51,12 @@ export class ProductService {
 interface ProductsResponse {
   _embedded: {
     products: Product[]
+  },
+  page: {
+    number: number,
+    size: number,
+    totalElements: number,
+    totalPages: number
   }
 }
 
