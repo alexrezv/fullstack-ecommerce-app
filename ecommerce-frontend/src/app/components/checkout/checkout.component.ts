@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from "@angular/forms";
 import { ShopFormService } from "../../services/shop-form.service";
+import { Country } from "../../common/country";
+import { State } from "../../common/state";
 
 @Component({
   selector: 'app-checkout',
@@ -10,6 +12,10 @@ import { ShopFormService } from "../../services/shop-form.service";
 export class CheckoutComponent implements OnInit {
 
   checkoutFormGroup: FormGroup
+
+  countries: Country[] = []
+  shippingAddressStates: State[] = []
+  billingAddressStates: State[] = []
 
   // TODO: remove when Stripe is integrated
   creditCardYears: number[] = []
@@ -52,6 +58,10 @@ export class CheckoutComponent implements OnInit {
       })
     })
 
+    this.shopFormService.getCountries().subscribe(
+      data => this.countries = data
+    )
+
     // sub on months and years
     // TODO: remove when Stripe is integrated
     const currentMonth: number = new Date().getMonth() + 1
@@ -63,13 +73,31 @@ export class CheckoutComponent implements OnInit {
     )
   }
 
+  getStates(formGroupName: string) {
+    const formGroup = this.checkoutFormGroup.get(formGroupName)
+    const countryCode = formGroup?.value.country.code
+
+    this.shopFormService.getStates(countryCode).subscribe(
+      data => {
+        if (formGroupName === 'shippingAddress') {
+          this.shippingAddressStates = data
+        } else {
+          this.billingAddressStates = data
+        }
+        formGroup?.get('state')?.setValue(data[0])
+      }
+    )
+  }
+
   copyShippingAddressToBillingAddress(event: any) {
     if (event.target.checked) {
       this.checkoutFormGroup.controls['billingAddress']
-        .setValue(this.checkoutFormGroup.controls['shippingAddress'].value);
+        .setValue(this.checkoutFormGroup.controls['shippingAddress'].value)
+      this.billingAddressStates = this.shippingAddressStates
     }
     else {
-      this.checkoutFormGroup.controls['billingAddress'].reset();
+      this.checkoutFormGroup.controls['billingAddress'].reset()
+      this.billingAddressStates = []
     }
   }
 
