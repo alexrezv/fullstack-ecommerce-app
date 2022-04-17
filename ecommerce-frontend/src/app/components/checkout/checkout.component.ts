@@ -3,6 +3,7 @@ import { FormBuilder, FormControl, FormGroup, Validators } from "@angular/forms"
 import { ShopFormService } from "../../services/shop-form.service";
 import { Country } from "../../common/country";
 import { State } from "../../common/state";
+import {ShopValidators} from "../../validators/shop-validators";
 
 @Component({
   selector: 'app-checkout',
@@ -28,30 +29,31 @@ export class CheckoutComponent implements OnInit {
               private shopFormService: ShopFormService) { }
 
   ngOnInit(): void {
+    const requiredTwoNotOnlyWhitespace = [Validators.required, Validators.minLength(2), ShopValidators.notOnlyWhiteSpace]
     this.checkoutFormGroup = this.formBuilder.group({
       customer: this.formBuilder.group({
-        firstName: new FormControl('', [Validators.required, Validators.minLength(2)]),
-        lastName: new FormControl('', [Validators.required, Validators.minLength(2)]),
+        firstName: new FormControl('', requiredTwoNotOnlyWhitespace),
+        lastName: new FormControl('', requiredTwoNotOnlyWhitespace),
         email: new FormControl('',
           [Validators.required, Validators.pattern('^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$')]),
       }),
       shippingAddress: this.formBuilder.group({
         country: new FormControl('', [Validators.required]),
         state: new FormControl('', [Validators.required]),
-        city: new FormControl('', [Validators.required, Validators.minLength(2)]),
-        street: new FormControl('', [Validators.required, Validators.minLength(2)]),
-        zipCode: new FormControl('', [Validators.required, Validators.minLength(2)]),
+        city: new FormControl('', requiredTwoNotOnlyWhitespace),
+        street: new FormControl('', requiredTwoNotOnlyWhitespace),
+        zipCode: new FormControl('', requiredTwoNotOnlyWhitespace),
       }),
       billingAddress: this.formBuilder.group({
         country: new FormControl('', [Validators.required]),
         state: new FormControl('', [Validators.required]),
-        city: new FormControl('', [Validators.required, Validators.minLength(2)]),
-        street: new FormControl('', [Validators.required, Validators.minLength(2)]),
-        zipCode: new FormControl('', [Validators.required, Validators.minLength(2)]),
+        city: new FormControl('', requiredTwoNotOnlyWhitespace),
+        street: new FormControl('', requiredTwoNotOnlyWhitespace),
+        zipCode: new FormControl('', requiredTwoNotOnlyWhitespace),
       }),
       creditCard: this.formBuilder.group({
         cardType: new FormControl('', [Validators.required]),
-        nameOnCard: new FormControl('', [Validators.required, Validators.minLength(2)]),
+        nameOnCard: new FormControl('', requiredTwoNotOnlyWhitespace),
         cardNumber: new FormControl('', [Validators.required, Validators.pattern('[0-9]{16}')]),
         securityCode: new FormControl('', [Validators.required, Validators.pattern('[0-9]{3}')]),
         expirationMonth: [''],
