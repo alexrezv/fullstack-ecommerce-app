@@ -40,3 +40,29 @@ CREATE TABLE IF NOT EXISTS ecommerce.product
         FOREIGN KEY (category_id)
             REFERENCES product_category (id)
 );
+
+-- -----------------------------------------------------
+-- Table ecommerce.country
+-- ----------------------------------------------------
+CREATE TABLE IF NOT EXISTS ecommerce.country
+(
+    id   BIGINT NOT NULL,
+    code VARCHAR(2) NULL DEFAULT NULL,
+    name VARCHAR(255) NULL DEFAULT NULL,
+    PRIMARY KEY (id)
+);
+
+-- -----------------------------------------------------
+-- Table ecommerce.state
+-- ----------------------------------------------------
+CREATE TABLE IF NOT EXISTS ecommerce.state
+(
+    id   BIGINT GENERATED ALWAYS AS IDENTITY,
+    name VARCHAR(255) NULL DEFAULT NULL,
+    country_id BIGINT
+        CONSTRAINT fk_country NOT NULL,
+    PRIMARY KEY (id),
+    CONSTRAINT fk_country
+        FOREIGN KEY (country_id)
+            REFERENCES country (id)
+);

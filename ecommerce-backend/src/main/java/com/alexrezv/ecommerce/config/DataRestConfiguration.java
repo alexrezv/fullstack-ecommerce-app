@@ -1,7 +1,9 @@
 package com.alexrezv.ecommerce.config;
 
+import com.alexrezv.ecommerce.entity.Country;
 import com.alexrezv.ecommerce.entity.Product;
 import com.alexrezv.ecommerce.entity.ProductCategory;
+import com.alexrezv.ecommerce.entity.State;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.rest.core.config.RepositoryRestConfiguration;
@@ -11,6 +13,7 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
 
 import javax.persistence.EntityManager;
 import javax.persistence.metamodel.Type;
+import java.util.List;
 
 @Configuration
 public class DataRestConfiguration implements RepositoryRestConfigurer {
@@ -24,18 +27,19 @@ public class DataRestConfiguration implements RepositoryRestConfigurer {
 
     @Override
     public void configureRepositoryRestConfiguration(RepositoryRestConfiguration config, CorsRegistry cors) {
-        HttpMethod[] restricted = {HttpMethod.PUT, HttpMethod.POST, HttpMethod.DELETE};
+        HttpMethod[] restrictedMethods = {HttpMethod.PUT, HttpMethod.POST, HttpMethod.PATCH, HttpMethod.DELETE};
 
-        config.getExposureConfiguration()
-                .forDomainType(Product.class)
-                .withItemExposure((metadata, httpMethods) -> httpMethods.disable(restricted))
-                .withCollectionExposure((metadata, httpMethods) -> httpMethods.disable(restricted));
-        config.getExposureConfiguration()
-                .forDomainType(ProductCategory.class)
-                .withItemExposure((metadata, httpMethods) -> httpMethods.disable(restricted))
-                .withCollectionExposure((metadata, httpMethods) -> httpMethods.disable(restricted));
+        List.of(Product.class, ProductCategory.class, Country.class, State.class)
+                .forEach(entity -> restrictAccess(config, restrictedMethods, entity));
 
         exposeIds(config);
+    }
+
+    void restrictAccess(RepositoryRestConfiguration config, HttpMethod[] restrictedMethods, Class<?> entity) {
+        config.getExposureConfiguration()
+                .forDomainType(entity)
+                .withItemExposure((metadata, httpMethods) -> httpMethods.disable(restrictedMethods))
+                .withCollectionExposure((metadata, httpMethods) -> httpMethods.disable(restrictedMethods));
     }
 
     private void exposeIds(RepositoryRestConfiguration config) {

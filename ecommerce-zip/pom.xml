@@ -90,7 +90,7 @@
                                                             <include>*.sql</include>
                                                         </includes>
                                                         <excludes>
-                                                            <exclude>02-createuser.sql</exclude>
+                                                            <exclude>01-create-user.sql</exclude>
                                                         </excludes>
                                                     </fileSet>
                                                 </fileSets>
