@@ -4,6 +4,7 @@ import { ShopFormService } from "../../services/shop-form.service";
 import { Country } from "../../common/country";
 import { State } from "../../common/state";
 import {ShopValidators} from "../../validators/shop-validators";
+import {CartService} from "../../services/cart.service";
 
 @Component({
   selector: 'app-checkout',
@@ -26,7 +27,8 @@ export class CheckoutComponent implements OnInit {
   totalQuantity: number = 0
 
   constructor(private formBuilder: FormBuilder,
-              private shopFormService: ShopFormService) { }
+              private shopFormService: ShopFormService,
+              private cartService: CartService) { }
 
   ngOnInit(): void {
     const requiredTwoNotOnlyWhitespace = [Validators.required, Validators.minLength(2), ShopValidators.notOnlyWhiteSpace]
@@ -73,6 +75,18 @@ export class CheckoutComponent implements OnInit {
     )
     this.shopFormService.getCreditCardYears().subscribe(
       data => this.creditCardYears = data
+    )
+
+    this.reviewCartTotals()
+  }
+
+  reviewCartTotals() {
+    this.cartService.totalPrice.subscribe(
+      totalPrice => this.totalPrice = totalPrice
+    )
+
+    this.cartService.totalQuantity.subscribe(
+      totalQuantity => this.totalQuantity = totalQuantity
     )
   }
 
